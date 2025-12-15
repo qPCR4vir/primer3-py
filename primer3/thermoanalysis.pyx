@@ -216,6 +216,16 @@ cdef class ThermoResult:
         else:
             return None
 
+    @property
+    def align_end_1(self) -> int:
+        """1-based position in seq1 of the terminal base pair / end."""
+        return self.thalres.align_end_1
+
+    @property
+    def align_end_2(self) -> int:
+        """1-based position in seq2 of the terminal base pair / end."""
+        return self.thalres.align_end_2
+
     def check_exc(self) -> ThermoResult:
         ''' Check the ``.msg`` attribute of the internal thalres struct and
         raise a :class:`RuntimeError` exception if it is not an empty string.
@@ -235,7 +245,9 @@ cdef class ThermoResult:
         return (
             f'ThermoResult(structure_found={self.structure_found}, '
             f'tm={self.tm:0.2f}, dg={self.dg:0.2f}, '
-            f'dh={self.dh:0.2f}, ds={self.ds:0.2f})'
+            f'dh={self.dh:0.2f}, ds={self.ds:0.2f}), '
+            f'align_end_1={self.align_end_1}, '
+            f'align_end_2={self.align_end_2})'
         )
 
     def __str__(self) -> str:
@@ -257,7 +269,9 @@ cdef class ThermoResult:
             'tm': precision(self.tm, pts),
             'dg': precision(self.dg, pts),
             'dh': precision(self.dh, pts),
-            'ds': precision(self.ds, pts)
+            'ds': precision(self.ds, pts),
+            'align_end_1': self.align_end_1,
+            'align_end_2': self.align_end_2
         }
 
 
