@@ -950,6 +950,8 @@ cdef class _ThermoAnalysis:
             _ThermoAnalysis self,
             unsigned char *s1,
             unsigned char *s2,
+            bint output_structure,
+            char* c_ascii_structure,
     ):
         '''
         C only end stability computation
@@ -957,20 +959,37 @@ cdef class _ThermoAnalysis:
         Args:
             s1: sequence string 1
             s2: sequence string 2
+            output_structure: If True, build output structure.
+            c_ascii_structure: Optional C structure string
 
         Returns:
             Computed end stability ``ThermoResult``
-
         '''
-        cdef ThermoResult tr_obj = ThermoResult()
+        cdef:
+            ThermoResult tr_obj = ThermoResult()
+            bint did_allocate = 0
 
         self.thalargs.dimer = 1
-        self.thalargs.type = <thal_alignment_type> 2 # thal_alignment_end1
+        self.thalargs.type = <thal_alignment_type> 2  # thal_alignment_end1
+
+        if output_structure:
+            if c_ascii_structure == NULL:
+                c_ascii_structure = <char*> malloc(
+                    (
+                        (strlen(<const char*> s1) +
+                         strlen(<const char*> s2)) * 4 +
+                         24
+                    )
+                )
+                c_ascii_structure[0] = b'\0'
+                did_allocate = 1
+            tr_obj.thalres.sec_struct = c_ascii_structure
 
         cdef:
             thal_args* targs = <thal_args*> &self.thalargs
             int emode = self.eval_mode
             thal_results* thalres = <thal_results*> &tr_obj.thalres
+            int do_output = 1 if output_structure else 0
 
         with nogil:
             thal(
@@ -979,21 +998,35 @@ cdef class _ThermoAnalysis:
                 <const thal_args*> targs,
                 <const thal_mode> emode,
                 thalres,
-                0,
+                do_output,
             )
+
+        if output_structure:
+            try:
+                tr_obj.ascii_structure = c_ascii_structure.decode('utf8')
+            finally:
+                if did_allocate:
+                    free(c_ascii_structure)
+                    c_ascii_structure = NULL
+                tr_obj.thalres.sec_struct = NULL
+
         return tr_obj
+
 
     def calc_end_stability(
             _ThermoAnalysis self,
             object seq1,
             object seq2,
+            bint output_structure = False,
     ) -> ThermoResult:
         ''' Calculate the 3' end stability of DNA sequence `seq1` against DNA
         sequence `seq2`
 
         Args:
-            seq1: sequence string 1
-            seq2: sequence string 2
+            seq1: (str | bytes) sequence string 1
+            seq2: (str | bytes) sequence string 2
+            output_structure: If True, build output structure.
+
 
         Returns:
             Computed end stability ``ThermoResult``
@@ -1011,6 +1044,8 @@ cdef class _ThermoAnalysis:
                 <_ThermoAnalysis> self,
                 s1,
                 s2,
+                output_structure,
+                NULL,
             )
         return tr_obj
 

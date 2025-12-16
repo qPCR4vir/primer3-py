@@ -108,6 +108,8 @@ cdef class _ThermoAnalysis:
             _ThermoAnalysis self,
             unsigned char* s1,
             unsigned char* s2,
+            bint output_structure,
+            char* c_ascii_structure,
     )
 
     cdef inline double calc_tm_c(
