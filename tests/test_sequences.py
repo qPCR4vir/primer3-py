@@ -278,11 +278,19 @@ class TestThermodynamicRegression(unittest.TestCase):
 
     def assert_thermo_result_equal(self, result1, result2, places=2) -> None:
         '''Assert that two thermodynamic results are approximately equal'''
-        for key, value in result1.items():
-            if isinstance(value, (int, float)):
-                self.assertAlmostEqual(value, result2[key], places=places)
-            elif isinstance(value, dict):
-                self.assert_thermo_result_equal(value, result2[key], places)
+        for key, expected in result2.items():
+            if isinstance(expected, (int, float)):
+                self.assertAlmostEqual(
+                    result1[key],
+                    expected,
+                    places=places,
+                )
+            elif isinstance(expected, dict):
+                self.assert_thermo_result_equal(
+                    result1[key],
+                    expected,
+                    places,
+                )
 
     def test_hairpin_regression(self) -> None:
         '''Test that hairpin calculations match standard values'''
