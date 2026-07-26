@@ -101,9 +101,16 @@ static const char *pr_program_name = "TMP";
 /*
  * Hack to support old SunOS headers.  (We do not try to declare _all_
  * undeclared functions; only those with non-int return types.)
+ * Only declare if we're on a very old pre-ANSI C system that might not have
+ * proper stdlib.h declarations. ANSI C (C89) and later guarantee strtod()
+ * is properly declared in stdlib.h, so we skip this on modern systems to
+ * avoid conflicts with the standard library declaration.
  */
 #ifndef __cplusplus
+#if !defined(__STDC__) && defined(__sun) && !defined(__SVR4)
+/* Very old pre-ANSI C SunOS systems might need this declaration */
 extern double strtod();
+#endif
 #endif
 
 /*
@@ -1359,6 +1366,15 @@ parse_intron_list(char *s,
       return *count;
     }
     if (t > INT_MAX || t < INT_MIN) {
+      return 0;
+    }
+    /* primer3-py: Bounds-check the destination fixed array (see
+     * docs/included_primer3_modifications.md). Without this, a list with more
+     * than PR_MAX_INTERVAL_ARRAY values overruns sa->primer_overlap_junctions
+     * / sa->intl_overlap_junctions and corrupts adjacent seq_args fields. The
+     * sibling interval parsers already bounds-check; this one did not. */
+    if (*count >= PR_MAX_INTERVAL_ARRAY) {
+      *count = 0;
       return 0;
     }
     list[*count] = t;
