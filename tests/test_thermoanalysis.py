@@ -347,6 +347,62 @@ class TestLowLevelBindings(unittest.TestCase):
             )
             self.assertAlmostEqual(binding_res.tm, wrapper_res.tm, 2)
 
+    def test_custom_alignment_metadata(self) -> None:
+        '''Test the alignment metadata exposed by the customized fork'''
+        ta = thermoanalysis.ThermoAnalysis()
+        seq1 = 'GTAAAACGACGGCCAGT'
+        seq2 = 'ACTGGCCGTCGTTTTAC'
+
+        result = ta.calc_end_stability(
+            seq1,
+            seq2,
+            output_structure=True,
+        )
+
+        self.assertTrue(result.structure_found)
+        self.assertEqual(result.align_end_1, len(seq1))
+        self.assertEqual(result.align_end_2, len(seq2))
+        self.assertEqual(
+            result.ascii_structure_lines,
+            [
+                'SEQ\t',
+                f'SEQ\t{seq1}',
+                'STR\tCATTTTGCTGCCGGTCA',
+                'STR\t',
+            ],
+        )
+
+        result_dict = result.todict()
+        self.assertEqual(result_dict['align_end_1'], len(seq1))
+        self.assertEqual(result_dict['align_end_2'], len(seq2))
+
+        result_repr = repr(result)
+        self.assertIn(
+            f', align_end_1={len(seq1)}, align_end_2={len(seq2)})',
+            result_repr,
+        )
+        self.assertNotIn('), align_end_1=', result_repr)
+
+    def test_custom_alignment_metadata_on_all_thermo_results(self) -> None:
+        '''Test that every thermodynamic result exposes alignment metadata'''
+        ta = thermoanalysis.ThermoAnalysis()
+        seq1 = 'GTAAAACGACGGCCAGT'
+        seq2 = 'ACTGGCCGTCGTTTTAC'
+        calculations = {
+            'hairpin': lambda: ta.calc_hairpin(seq1),
+            'homodimer': lambda: ta.calc_homodimer(seq1),
+            'heterodimer': lambda: ta.calc_heterodimer(seq1, seq2),
+            'end_stability': lambda: ta.calc_end_stability(seq1, seq2),
+        }
+
+        for name, calculation in calculations.items():
+            with self.subTest(calculation=name):
+                result = calculation()
+                self.assertIsInstance(result.align_end_1, int)
+                self.assertIsInstance(result.align_end_2, int)
+                self.assertIn('align_end_1', result.todict())
+                self.assertIn('align_end_2', result.todict())
+
     def test_correction_methods(self) -> None:
         '''Test different correction_methods'''
         self.rand_args()
