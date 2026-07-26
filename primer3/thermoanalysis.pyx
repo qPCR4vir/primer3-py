@@ -245,7 +245,7 @@ cdef class ThermoResult:
         return (
             f'ThermoResult(structure_found={self.structure_found}, '
             f'tm={self.tm:0.2f}, dg={self.dg:0.2f}, '
-            f'dh={self.dh:0.2f}, ds={self.ds:0.2f}), '
+            f'dh={self.dh:0.2f}, ds={self.ds:0.2f}, '
             f'align_end_1={self.align_end_1}, '
             f'align_end_2={self.align_end_2})'
         )
