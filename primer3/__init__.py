@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2025. Ben Pruitt & Nick Conway; 2014-2018 Wyss Institute
+# Copyright (C) 2014-2026. Ben Pruitt & Nick Conway; 2014-2018 Wyss Institute
 # See LICENSE for full GPLv2 license.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -23,24 +23,23 @@ oligonucleotide thermodynamics library.
 
 '''
 import os
-from typing import List
 
 # Per PEP-440 https://peps.python.org/pep-0440/#public-version-identifiers
-__version__ = '2.3.0'
+__version__ = '2.4.0'
 __author__ = 'Ben Pruitt, Nick Conway'
 __copyright__ = (
     'Copyright 2014-2026, Ben Pruitt & Nick Conway; 2014-2018 Wyss Institute'
 )
-__license__ = 'GPLv2'
+__license__ = 'GPL-2.0-or-later'
 DESCRIPTION = 'Python bindings for Primer3'
 
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
-def includes() -> List[str]:
+def includes() -> list[str]:
     '''
     Returns:
-        List of directories to include in egg/wheel during packaging
+        list of directories to include in egg/wheel during packaging
     '''
     return [LOCAL_DIR, os.path.join(LOCAL_DIR, 'src', 'libprimer3')]
 

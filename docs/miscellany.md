@@ -14,10 +14,13 @@ The included `libprimer3` source is a derivative of the Primer3 v2.6.1
 library that includes a number of optimizations and improvements to make it
 more amenable to Python C API / Cython bindings. Every effort has been made
 to ensure that the underlying algorithms and calculations deterministically
-produce the same results as the vanilla v2.6.1 Primer3 library.
+produce the same results as the vanilla v2.6.1 Primer3 library, with the
+exception of a small number of upstream bug fixes (made to the Primer3 `main`
+branch after v2.6.1 was tagged) that have been applied on top of v2.6.1.
 
-Intentional, behavior-affecting changes to the included C sources are tracked
-in [](included_primer3_modifications.md).
+Intentional, behavior-affecting changes to the included C sources, including
+those backported upstream fixes, are tracked in
+[](included_primer3_modifications.md).
 
 ## Future work
 
@@ -46,11 +49,12 @@ doi: 10.1093/nar/gks596
 ```
 
 All project code, including the derivative Primer3 library, is licensed
-under GPLv2. The included Python and Python C API bindings are
+under GPL-2.0-or-later. The included Python and Python C API bindings are
 Copyright (c) 2014-2026 Ben Pruitt, Nick Conway; 2014-2018 Wyss Institute for
 Biologically Inspired Engineering.
 
-See LICENSE for full GPLv2 license.
+See LICENSE for full GPLv2 license text; source file headers grant "or (at
+your option) any later version" per the GPL's own terms.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
